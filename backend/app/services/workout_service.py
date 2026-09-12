@@ -1,8 +1,10 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.user import User
+from app.models.program import ProgramWorkout
+from app.models.session import WorkoutSession
 from app.models.workout import PrescribedSet, WorkoutTemplate, WorkoutTemplateExercise
 from app.schemas.training import PrescribedSetIn, TemplateExerciseIn, WorkoutTemplateIn
 from app.services.exercise_seed import serialize_exercise
@@ -152,6 +154,20 @@ def delete_template(db: Session, user: User, template_id: int) -> None:
     template = db.get(WorkoutTemplate, template_id)
     if not template or template.user_id != user.id:
         raise HTTPException(404, "Workout not found")
+
+    # Remove program references to this template.
+    db.execute(
+        delete(ProgramWorkout).where(ProgramWorkout.template_id == template_id)
+    )
+
+    # Preserve workout history while removing the template reference.
+    db.query(WorkoutSession).filter(
+        WorkoutSession.template_id == template_id
+    ).update(
+        {WorkoutSession.template_id: None},
+        synchronize_session=False,
+    )
+
     db.delete(template)
     db.commit()
 
