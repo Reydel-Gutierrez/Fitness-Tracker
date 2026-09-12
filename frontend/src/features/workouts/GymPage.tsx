@@ -92,18 +92,29 @@ export function GymPage() {
   if (!session) return <div className="p-6 text-muted">{error || 'Loading workout…'}</div>
 
   return (
-    <div className="mx-auto min-h-svh max-w-lg bg-bg pb-28">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
-        <button className="text-sm text-muted" onClick={() => nav('/today')}>
+    <div className="mx-auto min-h-svh max-w-lg bg-bg pb-36 sm:pb-28">
+      <header
+        className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg/95 px-4 pb-3 backdrop-blur"
+        style={{
+          paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))',
+          paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+        }}
+      >
+        <button
+          className="flex min-h-12 min-w-12 items-center justify-start rounded-lg pr-3 text-sm text-muted active:bg-bg-overlay sm:min-h-0 sm:min-w-0 sm:rounded-none sm:pr-0"
+          onClick={() => nav('/today')}
+        >
           Exit
         </button>
-        <div className="text-center">
-          <div className="text-sm font-semibold">{session.name}</div>
+        <div className="min-w-0 px-2 text-center">
+          <div className="truncate text-sm font-semibold">{session.name}</div>
           <div className="text-xs text-muted">{session.exercises.length} exercises</div>
         </div>
-        <button className="text-sm text-accent" onClick={() => void finish()}>
+        <button className="hidden text-sm text-accent sm:inline-flex" onClick={() => void finish()}>
           Finish
         </button>
+        <div className="w-12 sm:hidden" aria-hidden="true" />
       </header>
 
       {resting && (
@@ -184,6 +195,21 @@ export function GymPage() {
         <Button variant="secondary" className="w-full" onClick={() => setPicker({ mode: 'add' })}>
           <Plus size={16} /> Add exercise
         </Button>
+      </div>
+
+      <div
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 px-4 pt-3 backdrop-blur sm:hidden"
+        style={{
+          paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))',
+          paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+        }}
+      >
+        <div className="mx-auto max-w-lg">
+          <Button className="h-14 w-full text-base font-semibold" onClick={() => void finish()}>
+            Finish Workout
+          </Button>
+        </div>
       </div>
 
       {picker && sessionId && (
