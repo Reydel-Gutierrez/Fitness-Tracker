@@ -1,0 +1,25 @@
+services:
+  fitness:
+    build: .
+    image: fitness-tracker:local
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      DATABASE_URL: sqlite:////data/fitness.db
+      USDA_FDC_API_KEY: ${USDA_FDC_API_KEY:-}
+      EXERCISE_IMAGES_DIR: /data/exercise-images
+    volumes:
+      - fitness-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  fitness-data:
